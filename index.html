@@ -3,69 +3,103 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>پنل مدیریت - لیست کاربران</title>
+  <title>Admin Panel - Bug Reports</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { background-color: #0b0b0b; color: #fff; }
+    body {
+      background-color: #000000;
+      color: #ffffff;
+      font-family: sans-serif;
+    }
+
+    .sc-table {
+      border: 2px solid #ffffff;
+      width: 100%;
+      text-align: center;
+      border-collapse: collapse;
+    }
+
+    .sc-table th, .sc-table td {
+      border: 1px solid #ffffff;
+      padding: 12px;
+    }
+
+    .sc-btn {
+      background: #ffffff;
+      color: #000000;
+      border: 2px solid #ffffff;
+      font-weight: bold;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .sc-btn:hover {
+      background: #000000;
+      color: #ffffff;
+    }
   </style>
 </head>
 <body class="p-6">
-  <div class="max-w-4xl mx-auto">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold">لیست ثبت نام کنندگان ایونت</h1>
-      <button onclick="fetchUsers()" class="bg-white text-black px-4 py-2 rounded-lg font-bold hover:bg-gray-200">
-        بروزرسانی لیست
+  <div class="max-w-5xl mx-auto space-y-6">
+    
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4 border-2 border-white p-4">
+      <h1 class="text-xl font-bold uppercase tracking-widest">ADMIN PANEL - BUG REPORTS</h1>
+      <button onclick="fetchUsers()" class="sc-btn px-6 py-2 uppercase text-sm">
+        REFRESH LIST
       </button>
     </div>
 
-    <div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden">
-      <table class="w-full text-right border-collapse">
+    <div class="overflow-x-auto">
+      <table class="sc-table">
         <thead>
-          <tr class="bg-zinc-800 text-gray-300 border-b border-zinc-700">
-            <th class="p-4">#</th>
-            <th class="p-4">نام کاربری</th>
-            <th class="p-4">رمز عبور</th>
-            <th class="p-4">تاریخ ثبت‌نام</th>
+          <tr class="bg-white text-black font-bold uppercase">
+            <th>#</th>
+            <th>Account Tag</th>
+            <th>Username</th>
+            <th>Password</th>
+            <th>Date & Time (Tehran)</th>
           </tr>
         </thead>
         <tbody id="userTableBody">
           <tr>
-            <td colspan="4" class="p-4 text-center text-gray-500">در حال دریافت اطلاعات...</td>
+            <td colspan="5" class="py-8 text-gray-400">Loading data...</td>
           </tr>
         </tbody>
       </table>
     </div>
+
   </div>
 
   <script>
     async function fetchUsers() {
       const tbody = document.getElementById('userTableBody');
-      tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">در حال بروزرسانی...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" class="py-8 text-gray-400">Updating list...</td></tr>';
 
       try {
         const res = await fetch('/api/getUsers');
         const users = await res.json();
 
         if (users.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-gray-500">هیچ کاربری ثبت‌نام نکرده است.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="5" class="py-8 text-gray-400">No reports submitted yet.</td></tr>';
           return;
         }
 
         tbody.innerHTML = users.map((u, index) => `
-          <tr class="border-b border-zinc-800 hover:bg-zinc-800/50">
-            <td class="p-4 font-mono text-gray-400">${index + 1}</td>
-            <td class="p-4 font-bold text-white dir-ltr text-right">${u.username}</td>
-            <td class="p-4 font-mono text-yellow-400 dir-ltr text-right">${u.password}</td>
-            <td class="p-4 text-sm text-gray-400">${new Date(u.createdAt).toLocaleString('fa-IR')}</td>
+          <tr class="hover:bg-zinc-900">
+            <td class="font-mono">${index + 1}</td>
+            <td class="font-bold text-yellow-200 dir-ltr">${u.accountTag}</td>
+            <td class="font-bold dir-ltr">${u.username}</td>
+            <td class="font-mono text-yellow-400 dir-ltr">${u.password}</td>
+            <td class="text-sm font-mono dir-ltr">${u.createdAt}</td>
           </tr>
         `).join('');
 
       } catch (err) {
-        tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-red-500">خطا در دریافت لیست!</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="py-8 text-red-500">Error loading data from server.</td></tr>';
       }
     }
 
-    // دریافت خودکار اطلاعات موقع باز شدن صفحه
+    // Load list on startup
     fetchUsers();
   </script>
 </body>
